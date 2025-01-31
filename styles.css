@@ -6,8 +6,9 @@
 
 body {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
+  justify-content: center;
   height: 100vh;
   background-color: #87CEEB; /* Azul cielo */
   font-family: Arial, sans-serif;
@@ -18,6 +19,20 @@ canvas {
   background: url('assets/background.jpg') repeat-x;
   display: block;
   border: 2px solid black;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.controls {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.controls button {
+  padding: 10px;
+  font-size: 16px;
+  cursor: pointer;
 }
 
 .game-over {

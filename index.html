@@ -2,12 +2,20 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <title>Mario Bros</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <canvas id="gameCanvas" width="800" height="400"></canvas>
+  <div class="controls">
+    <button id="left">?</button>
+    <button id="right">?</button>
+    <button id="jump">Jump</button>
+    <button id="pause">Pause</button>
+    <button id="reset">Reset</button>
+    <button id="invincible">Invincible</button>
+  </div>
   <div class="game-over" id="gameOver">GAME OVER</div>
   <audio id="backgroundMusic" loop>
     <source src="assets/music.mp3" type="audio/mpeg">

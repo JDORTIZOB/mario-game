@@ -5,20 +5,16 @@ const gameOverScreen = document.getElementById('gameOver');
 const backgroundMusic = document.getElementById('backgroundMusic');
 
 // Game variables
-let mario = { x: 50, y: 300, width: 30, height: 40, dx: 0, dy: 0, jumpPower: -15, isJumping: false, frame: 0, direction: 'right' };
+let mario = { x: 50, y: 300, width: 30, height: 40, dx: 0, dy: 0, jumpPower: -15, isJumping: false, frame: 0, direction: 'right', isInvincible: false };
 let gravity = 0.5;
 let keys = {};
-let platforms = [
-  { x: 0, y: 350, width: 800, height: 50 },
-  { x: 200, y: 300, width: 100, height: 10 },
-  { x: 400, y: 250, width: 100, height: 10 },
-  { x: 600, y: 200, width: 100, height: 10 }
-];
-let enemies = [{ x: 300, y: 330, width: 30, height: 30, dx: 2 }];
-let coins = [{ x: 250, y: 280, radius: 10 }, { x: 450, y: 230, radius: 10 }, { x: 650, y: 180, radius: 10 }];
+let platforms = [];
+let enemies = [];
+let coins = [];
 let score = 0;
 let level = 1;
 let isGameOver = false;
+let isPaused = false;
 
 // Load assets
 const marioSprite = new Image();
@@ -32,8 +28,18 @@ backgroundMusic.volume = 0.3;
 backgroundMusic.play();
 
 // Event listeners for controls
-document.addEventListener('keydown', (e) => keys[e.code] = true);
-document.addEventListener('keyup', (e) => keys[e.code] = false);
+document.getElementById('left').addEventListener('touchstart', () => keys['ArrowLeft'] = true);
+document.getElementById('left').addEventListener('touchend', () => keys['ArrowLeft'] = false);
+
+document.getElementById('right').addEventListener('touchstart', () => keys['ArrowRight'] = true);
+document.getElementById('right').addEventListener('touchend', () => keys['ArrowRight'] = false);
+
+document.getElementById('jump').addEventListener('touchstart', () => keys['Space'] = true);
+document.getElementById('jump').addEventListener('touchend', () => keys['Space'] = false);
+
+document.getElementById('pause').addEventListener('click', togglePause);
+document.getElementById('reset').addEventListener('click', resetGame);
+document.getElementById('invincible').addEventListener('click', toggleInvincibility);
 
 // Collision detection
 function collide(rect1, rect2) {
@@ -68,9 +74,23 @@ function drawMario() {
   ctx.drawImage(marioSprite, sx, sy, frameWidth, frameHeight, mario.x, mario.y, mario.width, mario.height);
 }
 
+// Generate platforms
+function generatePlatforms() {
+  platforms = [];
+  for (let i = 0; i < 3; i++) {
+    let platform = {
+      x: Math.random() * (canvas.width - 100),
+      y: 100 + i * 100,
+      width: 100,
+      height: 10
+    };
+    platforms.push(platform);
+  }
+}
+
 // Game loop
 function gameLoop() {
-  if (isGameOver) return;
+  if (isGameOver || isPaused) return;
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -115,7 +135,7 @@ function gameLoop() {
   // Platform collision
   let onGround = false;
   platforms.forEach(platform => {
-    if (collide(mario, platform)) {
+    if (collide(mario, platform) && mario.dy >= 0) {
       mario.dy = 0;
       mario.y = platform.y - mario.height;
       onGround = true;
@@ -145,13 +165,7 @@ function gameLoop() {
     enemy.x += enemy.dx;
     if (enemy.x <= 0 || enemy.x + enemy.width >= canvas.width) enemy.dx *= -1;
 
-    // Check if Mario jumps on the enemy
-    if (collide(mario, enemy) && mario.y + mario.height <= enemy.y + 10) {
-      enemies.splice(index, 1);
-      score += 50;
-      enemySound.currentTime = 0;
-      enemySound.play();
-    } else if (collide(mario, enemy)) {
+    if (!mario.isInvincible && collide(mario, enemy)) {
       isGameOver = true;
       gameOverScreen.style.display = 'block';
       backgroundMusic.pause();
@@ -173,14 +187,7 @@ function gameLoop() {
   // Level progression
   if (coins.length === 0) {
     level++;
-    
-    // Remove an enemy when progressing to a new level
-    if (enemies.length > 0) {
-      enemies.pop(); // Remove the last enemy
-    }
-
-    // Add new platform, enemy, and coin
-    platforms.push({ x: Math.random() * (canvas.width - 100), y: Math.random() * 200 + 50, width: 100, height: 10 });
+    generatePlatforms();
     enemies.push({ x: Math.random() * (canvas.width - 50), y: 330, width: 30, height: 30, dx: 2 });
     coins.push({ x: Math.random() * (canvas.width - 20), y: Math.random() * 200 + 50, radius: 10 });
   }
@@ -197,5 +204,26 @@ function gameLoop() {
   requestAnimationFrame(gameLoop);
 }
 
+// Toggle pause
+function togglePause() {
+  isPaused = !isPaused;
+  if (isPaused) {
+    backgroundMusic.pause();
+  } else {
+    backgroundMusic.play();
+  }
+}
+
+// Reset game
+function resetGame() {
+  location.reload();
+}
+
+// Toggle invincibility
+function toggleInvincibility() {
+  mario.isInvincible = !mario.isInvincible;
+}
+
 // Start the game loop
+generatePlatforms();
 marioSprite.onload = gameLoop;
