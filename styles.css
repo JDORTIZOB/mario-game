@@ -1,0 +1,31 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-color: #87CEEB; /* Azul cielo */
+  font-family: Arial, sans-serif;
+  overflow: hidden;
+}
+
+canvas {
+  background: url('assets/background.jpg') repeat-x;
+  display: block;
+  border: 2px solid black;
+}
+
+.game-over {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 3em;
+  color: red;
+  display: none;
+}
